@@ -1,0 +1,135 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f4fe0"><title>WorkLink</title>
+<style>
+:root{--bg:#f4f7ff;--card:#fff;--line:#dbe4f5;--t:#0f1b33;--m:#5b6b88;--a:#1f4fe0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px system-ui,sans-serif;padding-bottom:78px}
+#app{max-width:640px;margin:auto;padding:16px}h1{margin:8px 0}h1 span,a{color:var(--a)}a{cursor:pointer}
+.box{margin-top:6vh}.c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 1px 3px #1f4fe014}
+.m{color:var(--m);font-size:13px}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}
+input,select,textarea{width:100%;padding:12px;margin:5px 0;background:#fff;color:var(--t);border:1px solid var(--line);border-radius:10px;font:inherit}
+button{background:var(--a);color:#fff;border:0;border-radius:10px;padding:12px 16px;margin:4px 4px 4px 0;font:inherit;font-weight:600}
+button.g{background:#fff;color:var(--a);border:1px solid var(--a)}button.r{background:#d83a4a}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+nav div{flex:1;text-align:center;padding:9px 0;font-size:11px;color:var(--m)}nav div.on{color:var(--a);font-weight:600}nav i{display:block;font-style:normal;font-size:18px}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;background:#e4ecff;color:var(--a);font-size:12px}
+.me{background:var(--a);color:#fff;margin-left:auto}.b{max-width:80%;padding:8px 12px;border-radius:12px;margin:5px 0;background:#e9eef9}
+#log{display:flex;flex-direction:column;max-height:55vh;overflow:auto}label{display:block;margin:6px 0}label input{width:auto}
+#t{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#0f1b33;color:#fff;padding:10px 16px;border-radius:10px;display:none;z-index:9}
+</style></head><body><div id="t"></div><div id="app"></div><nav id="nav" style="display:none"></nav>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const CFG={u:'https://kzmsloulrvahegzzivwa.supabase.co',k:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6bXNsb3VscnZhaGVnenppdndhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI4MzE4MDAsImV4cCI6MjEwODQwNzgwMH0.ZCmT0WpKBfRFg4kXig3fOIfxmhUgSMA39KcuTKN8Rdw'};
+const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id),f=id=>$(id).value.trim(),app=$('app');
+const CATS=['Construction','Cleaning','Hospitality','Transport','Technology','Retail','Agriculture','Office work','Education','Other'];
+const TYPES=['Casual','Freelance','Part-time','Contract','Full-time'],PER=['hour','day','week','month','fixed'];
+const CO=(()=>{const o=[];try{const d=new Intl.DisplayNames(['en'],{type:'region'});for(let a=65;a<91;a++)for(let b=65;b<91;b++){const c=String.fromCharCode(a,b);if(/^(EU|UN|EZ|QO|ZZ|AC|CP|DG|EA|IC|TA|XA|XB)$/.test(c))continue;const n=d.of(c);if(n&&n!==c)o.push(n)}}catch(e){}return o.sort()})();
+const TOP=['USD','EUR','GBP','KES','NGN','ZAR','INR','AED'];
+const CUR=[...new Set([...TOP,...(Intl.supportedValuesOf?Intl.supportedValuesOf('currency'):[])])];
+const opt=(a,v)=>a.map(x=>`<option ${x==v?'selected':''}>${x}</option>`).join('');
+const cOpt=v=>`<option value="">Select country</option>${opt(CO,v)}`;
+const TZ=Intl.DateTimeFormat().resolvedOptions().timeZone;
+let sb,me,tab,poll,rec=false,J={},curTitle='';
+function toast(m){const t=$('t');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',3000)}
+async function boot(){
+ sb=supabase.createClient(CFG.u,CFG.k);
+ sb.auth.onAuthStateChange(e=>{if(e=='PASSWORD_RECOVERY'){rec=true;newPw()}});
+ const{data:{session}}=await sb.auth.getSession();
+ if(!rec)session?load(session.user):authView('login');
+}
+function authView(m){const s=m=='signup';$('nav').style.display='none';
+ app.innerHTML=`<div class=box><h1>Work<span>Link</span></h1><p class=m>Connect skills. Find work. Grow together.</p>
+ ${s?`<input id=n placeholder="Full name"><select id=r><option value=worker>I want work (Worker)</option><option value=employer>I want to hire (Employer)</option></select><select id=co>${cOpt()}</select><input id=ci placeholder="City"><input id=lg placeholder="Language" value="English">`:''}
+ <input id=em type=email placeholder=Email>${m!='reset'?'<input id=pw type=password placeholder="Password (min 8)">':''}
+ <button onclick="${m}()">${{login:'Log in',signup:'Create account',reset:'Send reset link'}[m]}</button>
+ <p class=m>${s?`<a onclick="authView('login')">Have an account? Log in</a>`:`<a onclick="authView('signup')">Create account</a> · <a onclick="authView('reset')">Forgot password?</a>`}</p></div>`}
+async function signup(){if(f('pw').length<8||!f('n')||!f('co'))return toast('Name, country and 8+ char password needed');
+ const{error}=await sb.auth.signUp({email:f('em'),password:f('pw'),options:{emailRedirectTo:location.href.split('#')[0],data:{role:f('r'),full_name:f('n'),country:f('co'),city:f('ci'),language:f('lg'),timezone:TZ}}});
+ error?toast(error.message):app.innerHTML=`<div class=box><h2>Check your email</h2><p>Open the verification link, then log in.</p><button onclick="authView('login')">Log in</button></div>`}
+async function login(){const{data,error}=await sb.auth.signInWithPassword({email:f('em'),password:f('pw')});error?toast(error.message):load(data.user)}
+async function reset(){const{error}=await sb.auth.resetPasswordForEmail(f('em'),{redirectTo:location.href.split('#')[0]});toast(error?error.message:'Reset link sent')}
+function newPw(){app.innerHTML=`<div class=box><h2>New password</h2><input id=pw type=password placeholder="New password"><button onclick="setPw()">Save</button></div>`}
+async function setPw(){const{data,error}=await sb.auth.updateUser({password:f('pw')});if(error)return toast(error.message);rec=false;load(data.user)}
+async function logout(){await sb.auth.signOut();me=null;authView('login')}
+async function load(u){
+ const{data}=await sb.from('profiles').select('*').eq('id',u.id).single();
+ if(!data)return toast('Profile missing - run the SQL schema first');
+ if(data.suspended){await sb.auth.signOut();return toast('Account suspended')}
+ me=data;const W=me.role!='employer';
+ const T=W?[['home','🏠','Home'],['find','🔍','Jobs'],['work','💼','My Work'],['msg','💬','Messages'],['alerts','🔔','Alerts'],['me','👤','Profile']]
+ :[['home','🏠','Home'],['jobs','💼','My Jobs'],['post','➕','Post'],['msg','💬','Messages'],['alerts','🔔','Alerts'],['me','👤','Profile']];
+ $('nav').style.display='flex';$('nav').innerHTML=T.map(x=>`<div id=n_${x[0]} onclick="go('${x[0]}')"><i>${x[1]}</i>${x[2]}</div>`).join('');go('home')}
+function go(t){tab=t;clearInterval(poll);document.querySelectorAll('nav div').forEach(d=>d.classList.toggle('on',d.id=='n_'+t));app.innerHTML='<p class=m>Loading…</p>';V[t]()}
+const saved=async()=>new Set(((await sb.from('saved_jobs').select('job_id').eq('user_id',me.id)).data||[]).map(x=>x.job_id));
+const notify=(uid,text)=>sb.from('notifications').insert({user_id:uid,text});
+const pay=j=>j.pay_amount?`${E(j.currency)} ${Number(j.pay_amount).toLocaleString()}${j.pay_max?'–'+Number(j.pay_max).toLocaleString():''}${j.pay_period=='fixed'?' fixed':' / '+E(j.pay_period)}`:'Pay negotiable';
+const jobCard=(j,S)=>{J[j.id]=j;return`<div class=c><b>${E(j.title)}</b> <span class=tag>${E(j.status)}</span>${j.remote?' <span class=tag>🌍 Remote</span>':''}<div class=m>${E(j.profiles?.full_name)} · ${E(j.city)}${j.city?', ':''}${E(j.country)}</div><div class=m>${E(j.job_type)} · ${E(j.category)} · ${pay(j)}</div><p>${E(j.description).slice(0,160)}</p>${me.role!='employer'?`<button onclick="apply('${j.id}')">Apply</button><button class=g onclick="save('${j.id}')">${S.has(j.id)?'Unsave':'Save'}</button><button class=g onclick="chat('${j.employer_id}')">Message</button>`:''}</div>`};
+async function apply(id){const m=prompt('Short message to employer (optional)');if(m===null)return;const j=J[id];
+ const{error}=await sb.from('applications').insert({job_id:id,worker_id:me.id,message:m});
+ if(error)return toast(error.code=='23505'?'Already applied':error.message);
+ notify(j.employer_id,`${me.full_name} applied for ${j.title}`);toast('Application sent')}
+async function save(id){const S=await saved();S.has(id)?await sb.from('saved_jobs').delete().eq('user_id',me.id).eq('job_id',id):await sb.from('saved_jobs').insert({user_id:me.id,job_id:id});V[tab]()}
+const V={
+async home(){
+ if(me.role=='employer'){
+  const c=async q=>(await q).count||0;
+  const o=await c(sb.from('jobs').select('*',{count:'exact',head:true}).eq('employer_id',me.id).eq('status','open'));
+  const p=await c(sb.from('applications').select('*',{count:'exact',head:true}).eq('status','pending'));
+  app.innerHTML=`<h2>Welcome, ${E(me.full_name)}</h2><div class=row><div class=c><h1>${o}</h1><span class=m>Open jobs</span></div><div class=c><h1>${p}</h1><span class=m>Applicants to review</span></div></div><button onclick="go('post')">Post a job</button><button class=g onclick="go('jobs')">Manage jobs</button>`;return}
+ let q=sb.from('jobs').select('*,profiles(full_name)').eq('status','open');
+ if(me.country)q=q.or(`country.eq.${me.country},remote.eq.true`);
+ const{data}=await q.order('created_at',{ascending:false}).limit(8);const S=await saved();
+ app.innerHTML=`<h2>Hello, ${E(me.full_name)} 👋</h2><p class=m>Newest jobs in ${E(me.country)} and remote</p>${(data||[]).map(j=>jobCard(j,S)).join('')||'<div class=c>No jobs yet. Try Jobs to search worldwide.</div>'}`},
+async find(){
+ app.innerHTML=`<h2>Find jobs</h2><input id=q placeholder="Job title or keyword"><div class=row><select id=cat><option value="">All categories</option>${opt(CATS)}</select><select id=ty><option value="">All types</option>${opt(TYPES)}</select></div><div class=row><select id=co><option value="">Worldwide</option>${opt(CO,me.country)}</select><input id=ci placeholder="City"></div><label><input type=checkbox id=rm> Remote jobs only</label><button onclick="runFind()">Search</button><div id=res></div>`;runFind()},
+async work(){
+ const{data:a}=await sb.from('applications').select('*,jobs(title,employer_id)').eq('worker_id',me.id).order('created_at',{ascending:false});
+ const{data:s}=await sb.from('saved_jobs').select('jobs(*,profiles(full_name))').eq('user_id',me.id);const S=new Set((s||[]).map(x=>x.jobs?.id));
+ app.innerHTML=`<h2>My applications</h2>${(a||[]).map(x=>`<div class=c><b>${E(x.jobs?.title)}</b> <span class=tag>${E(x.status)}</span><div class=m>${new Date(x.created_at).toLocaleDateString()}</div><button class=g onclick="chat('${x.jobs?.employer_id}')">Message employer</button></div>`).join('')||'<div class=c>No applications yet.</div>'}<h2>Saved jobs</h2>${(s||[]).filter(x=>x.jobs).map(x=>jobCard(x.jobs,S)).join('')||'<div class=c>Nothing saved.</div>'}`},
+async jobs(){
+ const{data}=await sb.from('jobs').select('*').eq('employer_id',me.id).order('created_at',{ascending:false});
+ app.innerHTML=`<h2>My jobs</h2>${(data||[]).map(j=>{J[j.id]=j;return`<div class=c><b>${E(j.title)}</b> <span class=tag>${E(j.status)}</span><div class=m>${E(j.city)} ${E(j.country)} · ${E(j.job_type)} · ${pay(j)}</div><button onclick="applicants('${j.id}')">Applicants</button><select onchange="jobStatus('${j.id}',this.value)" style="width:auto">${opt(['open','paused','filled','expired'],j.status)}</select><button class=r onclick="delJob('${j.id}')">Delete</button></div>`}).join('')||'<div class=c>No jobs posted.</div>'}`},
+post(){
+ app.innerHTML=`<h2>Post a job</h2><input id=ti placeholder="Job title"><div class=row><select id=cat>${opt(CATS)}</select><select id=ty>${opt(TYPES)}</select></div><div class=row><input id=pa type=number placeholder="Pay (min)"><input id=pm type=number placeholder="Pay (max, optional)"></div><div class=row><select id=cu>${opt(CUR,'USD')}</select><select id=pp>${opt(PER,'month')}</select></div><label><input type=checkbox id=rm> Remote / work from anywhere</label><div class=row><select id=co>${cOpt(me.country)}</select><input id=ci placeholder=City value="${E(me.city)}"></div><textarea id=ds rows=4 placeholder="Description"></textarea><textarea id=rq rows=3 placeholder="Requirements"></textarea><button onclick="postJob()">Publish</button>`},
+async msg(){
+ const{data}=await sb.from('messages').select('*').or(`sender_id.eq.${me.id},receiver_id.eq.${me.id}`).order('created_at',{ascending:false}).limit(200);
+ const L={};(data||[]).forEach(m=>{const o=m.sender_id==me.id?m.receiver_id:m.sender_id;if(!L[o])L[o]=m});
+ const ids=Object.keys(L);const{data:p}=ids.length?await sb.from('profiles').select('id,full_name').in('id',ids):{data:[]};
+ app.innerHTML=`<h2>Messages</h2>${ids.map(i=>`<div class=c onclick="chat('${i}')"><b>${E(p.find(x=>x.id==i)?.full_name)}</b><div class=m>${E(L[i].body).slice(0,60)}</div></div>`).join('')||'<div class=c>No conversations yet.</div>'}`},
+async alerts(){
+ const{data}=await sb.from('notifications').select('*').eq('user_id',me.id).order('created_at',{ascending:false}).limit(40);
+ app.innerHTML=`<h2>Alerts</h2>${(data||[]).map(n=>`<div class=c style="${n.read?'opacity:.6':''}">${E(n.text)}<div class=m>${new Date(n.created_at).toLocaleString()}</div></div>`).join('')||'<div class=c>All caught up.</div>'}`;
+ sb.from('notifications').update({read:true}).eq('user_id',me.id).eq('read',false).then(()=>{})},
+me(){const W=me.role!='employer';
+ app.innerHTML=`<h2>Profile <span class=tag>${E(me.role)}</span></h2><input id=n value="${E(me.full_name)}" placeholder=Name><input id=h value="${E(me.headline)}" placeholder="${W?'Headline (e.g. Electrician, 5 yrs)':'Company / tagline'}"><textarea id=b rows=3 placeholder=Bio>${E(me.bio)}</textarea>${W?`<input id=sk value="${E(me.skills)}" placeholder="Skills, comma separated"><select id=av>${opt(['Available','Busy','Not looking'],me.availability)}</select>`:''}<div class=row><select id=co>${cOpt(me.country)}</select><input id=ci value="${E(me.city)}" placeholder=City></div><input id=lg value="${E(me.language)}" placeholder=Language><p class=m>Time zone: ${E(me.timezone||TZ)}</p><button onclick="saveProfile()">Save</button><button class=g onclick="logout()">Log out</button>`}};
+async function runFind(){
+ let q=sb.from('jobs').select('*,profiles(full_name)').eq('status','open');
+ if(f('q'))q=q.ilike('title',`%${f('q').replace(/[,()%]/g,' ')}%`);
+ if(f('cat'))q=q.eq('category',f('cat'));if(f('ty'))q=q.eq('job_type',f('ty'));
+ if($('rm').checked)q=q.eq('remote',true);else if(f('co'))q=q.or(`country.eq.${f('co')},remote.eq.true`);
+ if(f('ci'))q=q.ilike('city',`%${f('ci').replace(/[,()%]/g,' ')}%`);
+ const{data}=await q.order('created_at',{ascending:false}).limit(40);const S=await saved();
+ $('res').innerHTML=(data||[]).map(j=>jobCard(j,S)).join('')||'<div class=c>No jobs match. Try fewer filters.</div>'}
+async function postJob(){const rm=$('rm').checked;if(!f('ti'))return toast('Title required');if(!rm&&!f('co'))return toast('Pick a country or mark Remote');
+ const{error}=await sb.from('jobs').insert({employer_id:me.id,title:f('ti'),category:f('cat'),job_type:f('ty'),remote:rm,pay_amount:f('pa')||null,pay_max:f('pm')||null,currency:f('cu'),pay_period:f('pp'),country:f('co')||null,city:f('ci'),description:f('ds'),requirements:f('rq')});
+ error?toast(error.message):(toast('Job published'),go('jobs'))}
+async function jobStatus(id,s){await sb.from('jobs').update({status:s}).eq('id',id);toast('Updated')}
+async function delJob(id){if(confirm('Delete this job and its applications?')){await sb.from('jobs').delete().eq('id',id);go('jobs')}}
+async function applicants(id){curTitle=J[id]?.title||'job';
+ const{data}=await sb.from('applications').select('*,profiles(full_name,headline,skills,city,country)').eq('job_id',id);
+ app.innerHTML=`<a onclick="go('jobs')">← Back</a><h2>${E(curTitle)}</h2>${(data||[]).map(a=>`<div class=c><b>${E(a.profiles?.full_name)}</b> <span class=tag>${E(a.status)}</span><div class=m>${E(a.profiles?.headline)} · ${E(a.profiles?.city)} ${E(a.profiles?.country)}</div><div class=m>Skills: ${E(a.profiles?.skills)}</div><p>${E(a.message)}</p><button onclick="setApp('${a.id}','shortlisted','${a.worker_id}','${id}')">Shortlist</button><button onclick="setApp('${a.id}','accepted','${a.worker_id}','${id}')">Accept</button><button class=r onclick="setApp('${a.id}','rejected','${a.worker_id}','${id}')">Reject</button><button class=g onclick="chat('${a.worker_id}')">Message</button></div>`).join('')||'<div class=c>No applicants yet.</div>'}`}
+async function setApp(id,s,wid,jid){await sb.from('applications').update({status:s}).eq('id',id);notify(wid,`Your application for ${curTitle} was ${s}`);applicants(jid)}
+async function saveProfile(){const u={full_name:f('n'),headline:f('h'),bio:f('b'),country:f('co'),city:f('ci'),language:f('lg')};
+ if($('sk')){u.skills=f('sk');u.availability=f('av')}
+ const{error}=await sb.from('profiles').update(u).eq('id',me.id);error?toast(error.message):(Object.assign(me,u),toast('Saved'))}
+async function chat(uid){clearInterval(poll);
+ const{data:p}=await sb.from('profiles').select('full_name').eq('id',uid).single();
+ app.innerHTML=`<a onclick="go('msg')">← Back</a><h3>${E(p?.full_name)}</h3><div id=log></div><div class=row style="position:sticky;bottom:80px;background:var(--bg)"><input id=mb placeholder="Type a message" style="flex:4"><button onclick="sendMsg('${uid}')">Send</button></div>`;
+ const draw=async()=>{const{data}=await sb.from('messages').select('*').or(`and(sender_id.eq.${me.id},receiver_id.eq.${uid}),and(sender_id.eq.${uid},receiver_id.eq.${me.id})`).order('created_at');
+  const l=$('log');if(!l)return clearInterval(poll);l.innerHTML=(data||[]).map(m=>`<div class="b ${m.sender_id==me.id?'me':''}">${E(m.body)}</div>`).join('');l.scrollTop=l.scrollHeight};
+ draw();poll=setInterval(draw,4000);window._draw=draw}
+async function sendMsg(uid){const b=f('mb');if(!b)return;$('mb').value='';
+ await sb.from('messages').insert({sender_id:me.id,receiver_id:uid,body:b});notify(uid,`New message from ${me.full_name}`);window._draw()}
+boot();
+</script></body></html>
