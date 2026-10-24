@@ -1,21 +1,21 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1f4fe0"><title>WorkLink</title>
+<meta name="theme-color" content="#0a1730"><title>WorkLink</title>
 <style>
-:root{--bg:#f4f7ff;--card:#fff;--line:#dbe4f5;--t:#0f1b33;--m:#5b6b88;--a:#1f4fe0}
+:root{color-scheme:dark;--bg:#0a1730;--card:#112347;--line:#1f3763;--t:#e8eefc;--m:#8da2c8;--a:#3d6bff}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px system-ui,sans-serif;padding-bottom:78px}
 #app{max-width:640px;margin:auto;padding:16px}h1{margin:8px 0}h1 span,a{color:var(--a)}a{cursor:pointer}
-.box{margin-top:6vh}.c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 1px 3px #1f4fe014}
+.box{margin-top:6vh}.c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 2px 8px #0006}
 .m{color:var(--m);font-size:13px}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}
-input,select,textarea{width:100%;padding:12px;margin:5px 0;background:#fff;color:var(--t);border:1px solid var(--line);border-radius:10px;font:inherit}
+input,select,textarea{width:100%;padding:12px;margin:5px 0;background:#0c1b38;color:var(--t);border:1px solid var(--line);border-radius:10px;font:inherit}
 button{background:var(--a);color:#fff;border:0;border-radius:10px;padding:12px 16px;margin:4px 4px 4px 0;font:inherit;font-weight:600}
-button.g{background:#fff;color:var(--a);border:1px solid var(--a)}button.r{background:#d83a4a}
-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+button.g{background:transparent;color:var(--a);border:1px solid var(--a)}button.r{background:#d83a4a}
+nav{position:fixed;bottom:0;left:0;right:0;background:#0c1b38;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
 nav div{flex:1;text-align:center;padding:9px 0;font-size:11px;color:var(--m)}nav div.on{color:var(--a);font-weight:600}nav i{display:block;font-style:normal;font-size:18px}
-.tag{display:inline-block;padding:2px 8px;border-radius:99px;background:#e4ecff;color:var(--a);font-size:12px}
-.me{background:var(--a);color:#fff;margin-left:auto}.b{max-width:80%;padding:8px 12px;border-radius:12px;margin:5px 0;background:#e9eef9}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;background:#1a2f5e;color:#9bb8ff;font-size:12px}
+.me{background:var(--a);color:#fff;margin-left:auto}.b{max-width:80%;padding:8px 12px;border-radius:12px;margin:5px 0;background:#1a2f5e}
 #log{display:flex;flex-direction:column;max-height:55vh;overflow:auto}label{display:block;margin:6px 0}label input{width:auto}
-#t{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#0f1b33;color:#fff;padding:10px 16px;border-radius:10px;display:none;z-index:9}
+#t{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:var(--a);color:#fff;padding:10px 16px;border-radius:10px;display:none;z-index:9}
 </style></head><body><div id="t"></div><div id="app"></div><nav id="nav" style="display:none"></nav>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
@@ -58,7 +58,7 @@ async function load(u){
  if(data.suspended){await sb.auth.signOut();return toast('Account suspended')}
  me=data;const W=me.role!='employer';
  const T=W?[['home','🏠','Home'],['find','🔍','Jobs'],['work','💼','My Work'],['msg','💬','Messages'],['alerts','🔔','Alerts'],['me','👤','Profile']]
- :[['home','🏠','Home'],['jobs','💼','My Jobs'],['post','➕','Post'],['msg','💬','Messages'],['alerts','🔔','Alerts'],['me','👤','Profile']];
+ :[['home','🏠','Home'],['workers','👥','Workers'],['jobs','💼','My Jobs'],['msg','💬','Messages'],['alerts','🔔','Alerts'],['me','👤','Profile']];
  $('nav').style.display='flex';$('nav').innerHTML=T.map(x=>`<div id=n_${x[0]} onclick="go('${x[0]}')"><i>${x[1]}</i>${x[2]}</div>`).join('');go('home')}
 function go(t){tab=t;clearInterval(poll);document.querySelectorAll('nav div').forEach(d=>d.classList.toggle('on',d.id=='n_'+t));app.innerHTML='<p class=m>Loading…</p>';V[t]()}
 const saved=async()=>new Set(((await sb.from('saved_jobs').select('job_id').eq('user_id',me.id)).data||[]).map(x=>x.job_id));
@@ -80,16 +80,18 @@ async home(){
  let q=sb.from('jobs').select('*,profiles(full_name)').eq('status','open');
  if(me.country)q=q.or(`country.eq.${me.country},remote.eq.true`);
  const{data}=await q.order('created_at',{ascending:false}).limit(8);const S=await saved();
- app.innerHTML=`<h2>Hello, ${E(me.full_name)} 👋</h2><p class=m>Newest jobs in ${E(me.country)} and remote</p>${(data||[]).map(j=>jobCard(j,S)).join('')||'<div class=c>No jobs yet. Try Jobs to search worldwide.</div>'}`},
+ app.innerHTML=`<h2>Hello, ${E(me.full_name)} 👋</h2><div class=row><input id=hq placeholder="Search jobs, skills or categories" onkeydown="if(event.key==='Enter')homeSearch()"><button style="flex:0" onclick="homeSearch()">Search</button></div><p class=m>Newest jobs in ${E(me.country)} and remote</p>${(data||[]).map(j=>jobCard(j,S)).join('')||'<div class=c>No jobs yet. Try Jobs to search worldwide.</div>'}`},
 async find(){
- app.innerHTML=`<h2>Find jobs</h2><input id=q placeholder="Job title or keyword"><div class=row><select id=cat><option value="">All categories</option>${opt(CATS)}</select><select id=ty><option value="">All types</option>${opt(TYPES)}</select></div><div class=row><select id=co><option value="">Worldwide</option>${opt(CO,me.country)}</select><input id=ci placeholder="City"></div><label><input type=checkbox id=rm> Remote jobs only</label><button onclick="runFind()">Search</button><div id=res></div>`;runFind()},
+ app.innerHTML=`<h2>Find jobs</h2><input id=q value="${E(window._q||'')}" oninput="deb(runFind)" placeholder="Search title, description, skills"><div class=row><select id=cat onchange="runFind()"><option value="">All categories</option>${opt(CATS)}</select><select id=ty onchange="runFind()"><option value="">All types</option>${opt(TYPES)}</select></div><div class=row><select id=co onchange="runFind()"><option value="">Worldwide</option>${opt(CO,me.country)}</select><input id=ci oninput="deb(runFind)" placeholder="City"></div><label><input type=checkbox id=rm onchange="runFind()"> Remote jobs only</label><div id=res></div>`;window._q='';runFind()},
 async work(){
  const{data:a}=await sb.from('applications').select('*,jobs(title,employer_id)').eq('worker_id',me.id).order('created_at',{ascending:false});
  const{data:s}=await sb.from('saved_jobs').select('jobs(*,profiles(full_name))').eq('user_id',me.id);const S=new Set((s||[]).map(x=>x.jobs?.id));
  app.innerHTML=`<h2>My applications</h2>${(a||[]).map(x=>`<div class=c><b>${E(x.jobs?.title)}</b> <span class=tag>${E(x.status)}</span><div class=m>${new Date(x.created_at).toLocaleDateString()}</div><button class=g onclick="chat('${x.jobs?.employer_id}')">Message employer</button></div>`).join('')||'<div class=c>No applications yet.</div>'}<h2>Saved jobs</h2>${(s||[]).filter(x=>x.jobs).map(x=>jobCard(x.jobs,S)).join('')||'<div class=c>Nothing saved.</div>'}`},
 async jobs(){
  const{data}=await sb.from('jobs').select('*').eq('employer_id',me.id).order('created_at',{ascending:false});
- app.innerHTML=`<h2>My jobs</h2>${(data||[]).map(j=>{J[j.id]=j;return`<div class=c><b>${E(j.title)}</b> <span class=tag>${E(j.status)}</span><div class=m>${E(j.city)} ${E(j.country)} · ${E(j.job_type)} · ${pay(j)}</div><button onclick="applicants('${j.id}')">Applicants</button><select onchange="jobStatus('${j.id}',this.value)" style="width:auto">${opt(['open','paused','filled','expired'],j.status)}</select><button class=r onclick="delJob('${j.id}')">Delete</button></div>`}).join('')||'<div class=c>No jobs posted.</div>'}`},
+ app.innerHTML=`<h2>My jobs</h2><button onclick="go('post')">+ Post a job</button>${(data||[]).map(j=>{J[j.id]=j;return`<div class=c><b>${E(j.title)}</b> <span class=tag>${E(j.status)}</span><div class=m>${E(j.city)} ${E(j.country)} · ${E(j.job_type)} · ${pay(j)}</div><button onclick="applicants('${j.id}')">Applicants</button><select onchange="jobStatus('${j.id}',this.value)" style="width:auto">${opt(['open','paused','filled','expired'],j.status)}</select><button class=r onclick="delJob('${j.id}')">Delete</button></div>`}).join('')||'<div class=c>No jobs posted.</div>'}`},
+async workers(){
+ app.innerHTML=`<h2>Find workers</h2><input id=wq oninput="deb(runWorkers)" placeholder="Skill, job title or keyword"><div class=row><select id=wc onchange="runWorkers()"><option value="">Worldwide</option>${opt(CO)}</select><input id=wi oninput="deb(runWorkers)" placeholder=City></div><label><input type=checkbox id=wa checked onchange="runWorkers()"> Available now only</label><div id=wres></div>`;runWorkers()},
 post(){
  app.innerHTML=`<h2>Post a job</h2><input id=ti placeholder="Job title"><div class=row><select id=cat>${opt(CATS)}</select><select id=ty>${opt(TYPES)}</select></div><div class=row><input id=pa type=number placeholder="Pay (min)"><input id=pm type=number placeholder="Pay (max, optional)"></div><div class=row><select id=cu>${opt(CUR,'USD')}</select><select id=pp>${opt(PER,'month')}</select></div><label><input type=checkbox id=rm> Remote / work from anywhere</label><div class=row><select id=co>${cOpt(me.country)}</select><input id=ci placeholder=City value="${E(me.city)}"></div><textarea id=ds rows=4 placeholder="Description"></textarea><textarea id=rq rows=3 placeholder="Requirements"></textarea><button onclick="postJob()">Publish</button>`},
 async msg(){
@@ -105,7 +107,7 @@ me(){const W=me.role!='employer';
  app.innerHTML=`<h2>Profile <span class=tag>${E(me.role)}</span></h2><input id=n value="${E(me.full_name)}" placeholder=Name><input id=h value="${E(me.headline)}" placeholder="${W?'Headline (e.g. Electrician, 5 yrs)':'Company / tagline'}"><textarea id=b rows=3 placeholder=Bio>${E(me.bio)}</textarea>${W?`<input id=sk value="${E(me.skills)}" placeholder="Skills, comma separated"><select id=av>${opt(['Available','Busy','Not looking'],me.availability)}</select>`:''}<div class=row><select id=co>${cOpt(me.country)}</select><input id=ci value="${E(me.city)}" placeholder=City></div><input id=lg value="${E(me.language)}" placeholder=Language><p class=m>Time zone: ${E(me.timezone||TZ)}</p><button onclick="saveProfile()">Save</button><button class=g onclick="logout()">Log out</button>`}};
 async function runFind(){
  let q=sb.from('jobs').select('*,profiles(full_name)').eq('status','open');
- if(f('q'))q=q.ilike('title',`%${f('q').replace(/[,()%]/g,' ')}%`);
+ {const k=f('q').replace(/[,()%]/g,' ');if(k)q=q.or(`title.ilike.%${k}%,description.ilike.%${k}%,requirements.ilike.%${k}%,category.ilike.%${k}%`)}
  if(f('cat'))q=q.eq('category',f('cat'));if(f('ty'))q=q.eq('job_type',f('ty'));
  if($('rm').checked)q=q.eq('remote',true);else if(f('co'))q=q.or(`country.eq.${f('co')},remote.eq.true`);
  if(f('ci'))q=q.ilike('city',`%${f('ci').replace(/[,()%]/g,' ')}%`);
@@ -131,5 +133,15 @@ async function chat(uid){clearInterval(poll);
  draw();poll=setInterval(draw,4000);window._draw=draw}
 async function sendMsg(uid){const b=f('mb');if(!b)return;$('mb').value='';
  await sb.from('messages').insert({sender_id:me.id,receiver_id:uid,body:b});notify(uid,`New message from ${me.full_name}`);window._draw()}
+let tm;const deb=fn=>{clearTimeout(tm);tm=setTimeout(fn,300)};
+function homeSearch(){window._q=f('hq');go('find')}
+async function runWorkers(){
+ let q=sb.from('profiles').select('*').eq('role','worker').eq('suspended',false);
+ const k=f('wq').replace(/[,()%]/g,' ');
+ if(k)q=q.or(`full_name.ilike.%${k}%,headline.ilike.%${k}%,skills.ilike.%${k}%,bio.ilike.%${k}%`);
+ if(f('wc'))q=q.eq('country',f('wc'));if(f('wi'))q=q.ilike('city',`%${f('wi').replace(/[,()%]/g,' ')}%`);
+ if($('wa').checked)q=q.eq('availability','Available');
+ const{data}=await q.order('created_at',{ascending:false}).limit(40);
+ $('wres').innerHTML=(data||[]).map(w=>`<div class=c><b>${E(w.full_name)}</b> <span class=tag>${E(w.availability)}</span><div class=m>${E(w.headline)} · ${E(w.city)}${w.city?', ':''}${E(w.country)}</div><p>${(w.skills||'').split(',').filter(x=>x.trim()).map(x=>`<span class=tag>${E(x.trim())}</span>`).join(' ')}</p><p class=m>${E(w.bio).slice(0,140)}</p><button onclick="chat('${w.id}')">Message</button></div>`).join('')||'<div class=c>No workers match. Try fewer filters.</div>'}
 boot();
 </script></body></html>
