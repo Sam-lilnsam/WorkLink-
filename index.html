@@ -1,21 +1,22 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0a1730"><title>WorkLink</title>
+<meta name="theme-color" content="#070b1d"><title>WorkLink</title>
 <style>
-:root{color-scheme:dark;--bg:#0a1730;--card:#112347;--line:#1f3763;--t:#e8eefc;--m:#8da2c8;--a:#3d6bff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px system-ui,sans-serif;padding-bottom:78px}
+:root{color-scheme:dark;--bg:#070b1d;--card:#0f1836cc;--line:#26387a;--t:#eaf0ff;--m:#93a4d0;--a:#5cf0d6;--g:linear-gradient(90deg,#5cf0d6,#6aa9ff)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0,#251a5e 0,transparent 45%),radial-gradient(circle at 90% 18%,#0f3b63 0,transparent 40%),var(--bg);background-attachment:fixed;color:var(--t);font:15px system-ui,sans-serif;padding-bottom:78px}
 #app{max-width:640px;margin:auto;padding:16px}h1{margin:8px 0}h1 span,a{color:var(--a)}a{cursor:pointer}
-.box{margin-top:6vh}.c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 2px 8px #0006}
+.box{margin-top:6vh}.c{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 2px 8px #0006}
 .m{color:var(--m);font-size:13px}.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}
-input,select,textarea{width:100%;padding:12px;margin:5px 0;background:#0c1b38;color:var(--t);border:1px solid var(--line);border-radius:10px;font:inherit}
-button{background:var(--a);color:#fff;border:0;border-radius:10px;padding:12px 16px;margin:4px 4px 4px 0;font:inherit;font-weight:600}
-button.g{background:transparent;color:var(--a);border:1px solid var(--a)}button.r{background:#d83a4a}
-nav{position:fixed;bottom:0;left:0;right:0;background:#0c1b38;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+input,select,textarea{width:100%;padding:12px;margin:5px 0;background:#0b1230;color:var(--t);border:1px solid var(--line);border-radius:10px;font:inherit}
+button{background:var(--g);color:#04121f;border:0;border-radius:10px;padding:12px 16px;margin:4px 4px 4px 0;font:inherit;font-weight:600}
+button.g{background:transparent;color:var(--a);border:1px solid var(--a)}button.r{background:#e5484d;color:#fff}
+nav{position:fixed;bottom:0;left:0;right:0;background:#0a1030;border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
 nav div{flex:1;text-align:center;padding:9px 0;font-size:11px;color:var(--m)}nav div.on{color:var(--a);font-weight:600}nav i{display:block;font-style:normal;font-size:18px}
-.tag{display:inline-block;padding:2px 8px;border-radius:99px;background:#1a2f5e;color:#9bb8ff;font-size:12px}
-.me{background:var(--a);color:#fff;margin-left:auto}.b{max-width:80%;padding:8px 12px;border-radius:12px;margin:5px 0;background:#1a2f5e}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;background:#5cf0d61f;color:#7fe9ff;font-size:12px}
+.me{background:var(--g);color:#04121f;margin-left:auto}.b{max-width:80%;padding:8px 12px;border-radius:12px;margin:5px 0;background:#172552}
 #log{display:flex;flex-direction:column;max-height:55vh;overflow:auto}label{display:block;margin:6px 0}label input{width:auto}
-#t{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:var(--a);color:#fff;padding:10px 16px;border-radius:10px;display:none;z-index:9}
+#t{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:var(--a);color:#04121f;padding:10px 16px;border-radius:10px;display:none;z-index:9}
+.legal h3{margin:16px 0 4px;font-size:16px}.legal p,.legal li{line-height:1.5}
 </style></head><body><div id="t"></div><div id="app"></div><nav id="nav" style="display:none"></nav>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
@@ -40,12 +41,12 @@ async function boot(){
 }
 function authView(m){const s=m=='signup';$('nav').style.display='none';
  app.innerHTML=`<div class=box><h1>Work<span>Link</span></h1><p class=m>Connect skills. Find work. Grow together.</p>
- ${s?`<input id=n placeholder="Full name"><select id=r><option value=worker>I want work (Worker)</option><option value=employer>I want to hire (Employer)</option></select><select id=co>${cOpt()}</select><input id=ci placeholder="City"><input id=lg placeholder="Language" value="English">`:''}
+ ${s?`<input id=n placeholder="Full name"><select id=r><option value=worker>I want work (Worker)</option><option value=employer>I want to hire (Employer)</option></select><select id=co>${cOpt()}</select><input id=ci placeholder="City"><input id=lg placeholder="Language" value="English"><label><input type=checkbox id=tc> I am 18 or older and agree to the <a onclick="legal('terms')">Terms</a> and <a onclick="legal('privacy')">Privacy Policy</a></label>`:''}
  <input id=em type=email placeholder=Email>${m!='reset'?'<input id=pw type=password placeholder="Password (min 8)">':''}
  <button onclick="${m}()">${{login:'Log in',signup:'Create account',reset:'Send reset link'}[m]}</button>
- <p class=m>${s?`<a onclick="authView('login')">Have an account? Log in</a>`:`<a onclick="authView('signup')">Create account</a> · <a onclick="authView('reset')">Forgot password?</a>`}</p></div>`}
-async function signup(){if(f('pw').length<8||!f('n')||!f('co'))return toast('Name, country and 8+ char password needed');
- const{error}=await sb.auth.signUp({email:f('em'),password:f('pw'),options:{emailRedirectTo:location.href.split('#')[0],data:{role:f('r'),full_name:f('n'),country:f('co'),city:f('ci'),language:f('lg'),timezone:TZ}}});
+ <p class=m>${s?`<a onclick="authView('login')">Have an account? Log in</a>`:`<a onclick="authView('signup')">Create account</a> · <a onclick="authView('reset')">Forgot password?</a>`}</p><p class=m><a onclick="legal()">Terms · Privacy · Safety</a></p></div>`}
+async function signup(){if(f('pw').length<8||!f('n')||!f('co'))return toast('Name, country and 8+ char password needed');if(!$('tc').checked)return toast('Please accept the Terms and Privacy Policy');
+ const{error}=await sb.auth.signUp({email:f('em'),password:f('pw'),options:{emailRedirectTo:location.href.split('#')[0],data:{role:f('r'),full_name:f('n'),country:f('co'),city:f('ci'),language:f('lg'),timezone:TZ,terms_accepted:new Date().toISOString()}}});
  error?toast(error.message):app.innerHTML=`<div class=box><h2>Check your email</h2><p>Open the verification link, then log in.</p><button onclick="authView('login')">Log in</button></div>`}
 async function login(){const{data,error}=await sb.auth.signInWithPassword({email:f('em'),password:f('pw')});error?toast(error.message):load(data.user)}
 async function reset(){const{error}=await sb.auth.resetPasswordForEmail(f('em'),{redirectTo:location.href.split('#')[0]});toast(error?error.message:'Reset link sent')}
@@ -57,18 +58,18 @@ async function load(u){
  if(!data)return toast('Profile missing - run the SQL schema first');
  if(data.suspended){await sb.auth.signOut();return toast('Account suspended')}
  me=data;const W=me.role!='employer';
- const T=W?[['home','🏠','Home'],['find','🔍','Jobs'],['work','💼','My Work'],['msg','💬','Messages'],['alerts','🔔','Alerts'],['me','👤','Profile']]
+ const T=me.role=='admin'?[['admin','🛡️','Admin'],['find','🔍','Jobs'],['workers','👥','Workers'],['msg','💬','Messages'],['alerts','🔔','Alerts'],['me','👤','Profile']]:W?[['home','🏠','Home'],['find','🔍','Jobs'],['work','💼','My Work'],['msg','💬','Messages'],['alerts','🔔','Alerts'],['me','👤','Profile']]
  :[['home','🏠','Home'],['workers','👥','Workers'],['jobs','💼','My Jobs'],['msg','💬','Messages'],['alerts','🔔','Alerts'],['me','👤','Profile']];
- $('nav').style.display='flex';$('nav').innerHTML=T.map(x=>`<div id=n_${x[0]} onclick="go('${x[0]}')"><i>${x[1]}</i>${x[2]}</div>`).join('');go('home')}
+ $('nav').style.display='flex';$('nav').innerHTML=T.map(x=>`<div id=n_${x[0]} onclick="go('${x[0]}')"><i>${x[1]}</i>${x[2]}</div>`).join('');go(me.role=='admin'?'admin':'home')}
 function go(t){tab=t;clearInterval(poll);document.querySelectorAll('nav div').forEach(d=>d.classList.toggle('on',d.id=='n_'+t));app.innerHTML='<p class=m>Loading…</p>';V[t]()}
 const saved=async()=>new Set(((await sb.from('saved_jobs').select('job_id').eq('user_id',me.id)).data||[]).map(x=>x.job_id));
 const notify=(uid,text)=>sb.from('notifications').insert({user_id:uid,text});
 const pay=j=>j.pay_amount?`${E(j.currency)} ${Number(j.pay_amount).toLocaleString()}${j.pay_max?'–'+Number(j.pay_max).toLocaleString():''}${j.pay_period=='fixed'?' fixed':' / '+E(j.pay_period)}`:'Pay negotiable';
-const jobCard=(j,S)=>{J[j.id]=j;return`<div class=c><b>${E(j.title)}</b> <span class=tag>${E(j.status)}</span>${j.remote?' <span class=tag>🌍 Remote</span>':''}<div class=m>${E(j.profiles?.full_name)} · ${E(j.city)}${j.city?', ':''}${E(j.country)}</div><div class=m>${E(j.job_type)} · ${E(j.category)} · ${pay(j)}</div><p>${E(j.description).slice(0,160)}</p>${me.role!='employer'?`<button onclick="apply('${j.id}')">Apply</button><button class=g onclick="save('${j.id}')">${S.has(j.id)?'Unsave':'Save'}</button><button class=g onclick="chat('${j.employer_id}')">Message</button>`:''}</div>`};
-async function apply(id){const m=prompt('Short message to employer (optional)');if(m===null)return;const j=J[id];
+const jobCard=(j,S)=>{J[j.id]=j;return`<div class=c><b>${E(j.title)}</b> <span class=tag>${E(j.status)}</span>${j.remote?' <span class=tag>🌍 Remote</span>':''}<div class=m>${E(j.profiles?.full_name)} ${j.profiles?.verified?'<span class=tag>✅ Email verified</span>':'<span class=tag>⚠️ Unverified</span>'} · ${E(j.city)}${j.city?', ':''}${E(j.country)}</div><div class=m>${E(j.job_type)} · ${E(j.category)} · ${pay(j)}</div><p>${E(j.description).slice(0,160)}</p>${me.role!='employer'?`<button onclick="apply('${j.id}')">⚡ Apply in 1 tap</button><button class=g onclick="save('${j.id}')">${S.has(j.id)?'Unsave':'Save'}</button><button class=g onclick="chat('${j.employer_id}')">Message</button><button class=g onclick="report('${j.id}')">Report</button>`:''}</div>`};
+async function apply(id){const m='';const j=J[id];
  const{error}=await sb.from('applications').insert({job_id:id,worker_id:me.id,message:m});
  if(error)return toast(error.code=='23505'?'Already applied':error.message);
- notify(j.employer_id,`${me.full_name} applied for ${j.title}`);toast('Application sent')}
+ notify(j.employer_id,`${me.full_name} applied for ${j.title}`);toast('Applied ✓ Employers can see your profile and documents')}
 async function save(id){const S=await saved();S.has(id)?await sb.from('saved_jobs').delete().eq('user_id',me.id).eq('job_id',id):await sb.from('saved_jobs').insert({user_id:me.id,job_id:id});V[tab]()}
 const V={
 async home(){
@@ -77,7 +78,7 @@ async home(){
   const o=await c(sb.from('jobs').select('*',{count:'exact',head:true}).eq('employer_id',me.id).eq('status','open'));
   const p=await c(sb.from('applications').select('*',{count:'exact',head:true}).eq('status','pending'));
   app.innerHTML=`<h2>Welcome, ${E(me.full_name)}</h2><div class=row><div class=c><h1>${o}</h1><span class=m>Open jobs</span></div><div class=c><h1>${p}</h1><span class=m>Applicants to review</span></div></div><button onclick="go('post')">Post a job</button><button class=g onclick="go('jobs')">Manage jobs</button>`;return}
- let q=sb.from('jobs').select('*,profiles(full_name)').eq('status','open');
+ let q=sb.from('jobs').select('*,profiles(full_name,verified)').eq('status','open');
  if(me.country)q=q.or(`country.eq.${me.country},remote.eq.true`);
  const{data}=await q.order('created_at',{ascending:false}).limit(8);const S=await saved();
  app.innerHTML=`<h2>Hello, ${E(me.full_name)} 👋</h2><div class=row><input id=hq placeholder="Search jobs, skills or categories" onkeydown="if(event.key==='Enter')homeSearch()"><button style="flex:0" onclick="homeSearch()">Search</button></div><p class=m>Newest jobs in ${E(me.country)} and remote</p>${(data||[]).map(j=>jobCard(j,S)).join('')||'<div class=c>No jobs yet. Try Jobs to search worldwide.</div>'}`},
@@ -85,11 +86,25 @@ async find(){
  app.innerHTML=`<h2>Find jobs</h2><input id=q value="${E(window._q||'')}" oninput="deb(runFind)" placeholder="Search title, description, skills"><div class=row><select id=cat onchange="runFind()"><option value="">All categories</option>${opt(CATS)}</select><select id=ty onchange="runFind()"><option value="">All types</option>${opt(TYPES)}</select></div><div class=row><select id=co onchange="runFind()"><option value="">Worldwide</option>${opt(CO,me.country)}</select><input id=ci oninput="deb(runFind)" placeholder="City"></div><label><input type=checkbox id=rm onchange="runFind()"> Remote jobs only</label><div id=res></div>`;window._q='';runFind()},
 async work(){
  const{data:a}=await sb.from('applications').select('*,jobs(title,employer_id)').eq('worker_id',me.id).order('created_at',{ascending:false});
- const{data:s}=await sb.from('saved_jobs').select('jobs(*,profiles(full_name))').eq('user_id',me.id);const S=new Set((s||[]).map(x=>x.jobs?.id));
+ const{data:s}=await sb.from('saved_jobs').select('jobs(*,profiles(full_name,verified))').eq('user_id',me.id);const S=new Set((s||[]).map(x=>x.jobs?.id));
  app.innerHTML=`<h2>My applications</h2>${(a||[]).map(x=>`<div class=c><b>${E(x.jobs?.title)}</b> <span class=tag>${E(x.status)}</span><div class=m>${new Date(x.created_at).toLocaleDateString()}</div><button class=g onclick="chat('${x.jobs?.employer_id}')">Message employer</button></div>`).join('')||'<div class=c>No applications yet.</div>'}<h2>Saved jobs</h2>${(s||[]).filter(x=>x.jobs).map(x=>jobCard(x.jobs,S)).join('')||'<div class=c>Nothing saved.</div>'}`},
 async jobs(){
  const{data}=await sb.from('jobs').select('*').eq('employer_id',me.id).order('created_at',{ascending:false});
  app.innerHTML=`<h2>My jobs</h2><button onclick="go('post')">+ Post a job</button>${(data||[]).map(j=>{J[j.id]=j;return`<div class=c><b>${E(j.title)}</b> <span class=tag>${E(j.status)}</span><div class=m>${E(j.city)} ${E(j.country)} · ${E(j.job_type)} · ${pay(j)}</div><button onclick="applicants('${j.id}')">Applicants</button><select onchange="jobStatus('${j.id}',this.value)" style="width:auto">${opt(['open','paused','filled','expired'],j.status)}</select><button class=r onclick="delJob('${j.id}')">Delete</button></div>`}).join('')||'<div class=c>No jobs posted.</div>'}`},
+async admin(){
+ if(me.role!='admin')return go('home');
+ const{data:S,error}=await sb.rpc('admin_stats');
+ if(error)return app.innerHTML=`<div class=c>Admin data unavailable: ${E(error.message)}. Run the v3 SQL first.</div>`;
+ const{data:U}=await sb.from('profiles').select('id,full_name,role,country,verified,suspended').order('created_at',{ascending:false}).limit(15);
+ const{data:Jb}=await sb.from('jobs').select('id,title,status,country').order('created_at',{ascending:false}).limit(10);
+ const{data:Rp}=await sb.from('reports').select('*,jobs(title)').eq('status','open').order('created_at',{ascending:false}).limit(10);
+ const mx=Math.max(1,...(S.signups||[]).map(x=>x.n));const card=(l,v)=>`<div class=c><span class=m>${l}</span><h1>${v}</h1></div>`;
+ app.innerHTML=`<h2>🛡️ Admin</h2><div class=row>${card('Users',S.users)}${card('Workers',S.workers)}</div><div class=row>${card('Employers',S.employers)}${card('Open jobs',S.jobs_open)}</div><div class=row>${card('Applications',S.applications)}${card('Messages',S.messages)}</div>
+<div class=c><b>Sign-ups, last 14 days</b><div style="display:flex;align-items:flex-end;gap:4px;height:80px;margin-top:8px">${(S.signups||[]).map(x=>`<div title="${x.d}: ${x.n}" style="flex:1;height:${Math.round(x.n/mx*100)}%;min-height:4px;background:var(--g);border-radius:4px"></div>`).join('')||'<span class=m>No sign-ups yet</span>'}</div></div>
+<div class=c><b>Top countries</b>${(S.countries||[]).map(x=>`<div class=m>${E(x.c)} · ${x.n}</div>`).join('')}</div>
+<h3>Open reports</h3>${(Rp||[]).map(r=>`<div class=c><b>${E(r.jobs?.title)}</b><div class=m>${E(r.reason)}</div><button class=r onclick="adminJob('${r.job_id}')">Remove job</button><button class=g onclick="closeReport('${r.id}')">Dismiss</button></div>`).join('')||'<div class=c>None 🎉</div>'}
+<h3>Latest users</h3>${(U||[]).map(u=>`<div class=c><b>${E(u.full_name)}</b> <span class=tag>${E(u.role)}</span>${u.verified?' <span class=tag>✅ verified</span>':''}${u.suspended?' <span class=tag>suspended</span>':''}<div class=m>${E(u.country)}</div>${u.role!='admin'?`<button class=g onclick="adminUser('${u.id}','verified',${!u.verified})">${u.verified?'Unverify':'Verify'}</button><button class=${u.suspended?'g':'r'} onclick="adminUser('${u.id}','suspended',${!u.suspended})">${u.suspended?'Unsuspend':'Suspend'}</button>`:''}</div>`).join('')}
+<h3>Latest jobs</h3>${(Jb||[]).map(j=>`<div class=c><b>${E(j.title)}</b> <span class=tag>${E(j.status)}</span><div class=m>${E(j.country)}</div><button class=r onclick="adminJob('${j.id}')">Remove</button></div>`).join('')}`},
 async workers(){
  app.innerHTML=`<h2>Find workers</h2><input id=wq oninput="deb(runWorkers)" placeholder="Skill, job title or keyword"><div class=row><select id=wc onchange="runWorkers()"><option value="">Worldwide</option>${opt(CO)}</select><input id=wi oninput="deb(runWorkers)" placeholder=City></div><label><input type=checkbox id=wa checked onchange="runWorkers()"> Available now only</label><div id=wres></div>`;runWorkers()},
 post(){
@@ -104,9 +119,9 @@ async alerts(){
  app.innerHTML=`<h2>Alerts</h2>${(data||[]).map(n=>`<div class=c style="${n.read?'opacity:.6':''}">${E(n.text)}<div class=m>${new Date(n.created_at).toLocaleString()}</div></div>`).join('')||'<div class=c>All caught up.</div>'}`;
  sb.from('notifications').update({read:true}).eq('user_id',me.id).eq('read',false).then(()=>{})},
 me(){const W=me.role!='employer';
- app.innerHTML=`<h2>Profile <span class=tag>${E(me.role)}</span></h2><input id=n value="${E(me.full_name)}" placeholder=Name><input id=h value="${E(me.headline)}" placeholder="${W?'Headline (e.g. Electrician, 5 yrs)':'Company / tagline'}"><textarea id=b rows=3 placeholder=Bio>${E(me.bio)}</textarea>${W?`<input id=sk value="${E(me.skills)}" placeholder="Skills, comma separated"><select id=av>${opt(['Available','Busy','Not looking'],me.availability)}</select>`:''}<div class=row><select id=co>${cOpt(me.country)}</select><input id=ci value="${E(me.city)}" placeholder=City></div><input id=lg value="${E(me.language)}" placeholder=Language><p class=m>Time zone: ${E(me.timezone||TZ)}</p><button onclick="saveProfile()">Save</button><button class=g onclick="logout()">Log out</button>`}};
+ app.innerHTML=`<h2>Profile <span class=tag>${E(me.role)}</span></h2><input id=n value="${E(me.full_name)}" placeholder=Name><input id=h value="${E(me.headline)}" placeholder="${W?'Headline (e.g. Electrician, 5 yrs)':'Company / tagline'}"><textarea id=b rows=3 placeholder=Bio>${E(me.bio)}</textarea>${W?`<input id=sk value="${E(me.skills)}" placeholder="Skills, comma separated"><select id=av>${opt(['Available','Busy','Not looking'],me.availability)}</select>`:''}<div class=row><select id=co>${cOpt(me.country)}</select><input id=ci value="${E(me.city)}" placeholder=City></div><input id=lg value="${E(me.language)}" placeholder=Language><p class=m>Time zone: ${E(me.timezone||TZ)}</p><div id=docs></div><button onclick="saveProfile()">Save</button><button class=g onclick="legal()">Terms, privacy &amp; safety</button><button class=g onclick="logout()">Log out</button>`;if(W)loadDocs()}};
 async function runFind(){
- let q=sb.from('jobs').select('*,profiles(full_name)').eq('status','open');
+ let q=sb.from('jobs').select('*,profiles(full_name,verified)').eq('status','open');
  {const k=f('q').replace(/[,()%]/g,' ');if(k)q=q.or(`title.ilike.%${k}%,description.ilike.%${k}%,requirements.ilike.%${k}%,category.ilike.%${k}%`)}
  if(f('cat'))q=q.eq('category',f('cat'));if(f('ty'))q=q.eq('job_type',f('ty'));
  if($('rm').checked)q=q.eq('remote',true);else if(f('co'))q=q.or(`country.eq.${f('co')},remote.eq.true`);
@@ -119,8 +134,8 @@ async function postJob(){const rm=$('rm').checked;if(!f('ti'))return toast('Titl
 async function jobStatus(id,s){await sb.from('jobs').update({status:s}).eq('id',id);toast('Updated')}
 async function delJob(id){if(confirm('Delete this job and its applications?')){await sb.from('jobs').delete().eq('id',id);go('jobs')}}
 async function applicants(id){curTitle=J[id]?.title||'job';
- const{data}=await sb.from('applications').select('*,profiles(full_name,headline,skills,city,country)').eq('job_id',id);
- app.innerHTML=`<a onclick="go('jobs')">← Back</a><h2>${E(curTitle)}</h2>${(data||[]).map(a=>`<div class=c><b>${E(a.profiles?.full_name)}</b> <span class=tag>${E(a.status)}</span><div class=m>${E(a.profiles?.headline)} · ${E(a.profiles?.city)} ${E(a.profiles?.country)}</div><div class=m>Skills: ${E(a.profiles?.skills)}</div><p>${E(a.message)}</p><button onclick="setApp('${a.id}','shortlisted','${a.worker_id}','${id}')">Shortlist</button><button onclick="setApp('${a.id}','accepted','${a.worker_id}','${id}')">Accept</button><button class=r onclick="setApp('${a.id}','rejected','${a.worker_id}','${id}')">Reject</button><button class=g onclick="chat('${a.worker_id}')">Message</button></div>`).join('')||'<div class=c>No applicants yet.</div>'}`}
+ const{data}=await sb.from('applications').select('*,profiles(full_name,headline,skills,city,country)').eq('job_id',id);const ids=(data||[]).map(a=>a.worker_id);const{data:D}=ids.length?await sb.from('documents').select('*').in('user_id',ids):{data:[]};const dl=u=>(D||[]).filter(d=>d.user_id==u).map(d=>`<button class=g onclick="openDoc('${d.path}')">📄 ${E(d.doc_type)}</button>`).join('')||'<span class=m>No documents uploaded</span>';
+ app.innerHTML=`<a onclick="go('jobs')">← Back</a><h2>${E(curTitle)}</h2>${(data||[]).map(a=>`<div class=c><b>${E(a.profiles?.full_name)}</b> <span class=tag>${E(a.status)}</span><div class=m>${E(a.profiles?.headline)} · ${E(a.profiles?.city)} ${E(a.profiles?.country)}</div><div class=m>Skills: ${E(a.profiles?.skills)}</div><p>${E(a.message)}</p><div>${dl(a.worker_id)}</div><button onclick="setApp('${a.id}','shortlisted','${a.worker_id}','${id}')">Shortlist</button><button onclick="setApp('${a.id}','accepted','${a.worker_id}','${id}')">Accept</button><button class=r onclick="setApp('${a.id}','rejected','${a.worker_id}','${id}')">Reject</button><button class=g onclick="chat('${a.worker_id}')">Message</button></div>`).join('')||'<div class=c>No applicants yet.</div>'}`}
 async function setApp(id,s,wid,jid){await sb.from('applications').update({status:s}).eq('id',id);notify(wid,`Your application for ${curTitle} was ${s}`);applicants(jid)}
 async function saveProfile(){const u={full_name:f('n'),headline:f('h'),bio:f('b'),country:f('co'),city:f('ci'),language:f('lg')};
  if($('sk')){u.skills=f('sk');u.availability=f('av')}
@@ -142,6 +157,61 @@ async function runWorkers(){
  if(f('wc'))q=q.eq('country',f('wc'));if(f('wi'))q=q.ilike('city',`%${f('wi').replace(/[,()%]/g,' ')}%`);
  if($('wa').checked)q=q.eq('availability','Available');
  const{data}=await q.order('created_at',{ascending:false}).limit(40);
- $('wres').innerHTML=(data||[]).map(w=>`<div class=c><b>${E(w.full_name)}</b> <span class=tag>${E(w.availability)}</span><div class=m>${E(w.headline)} · ${E(w.city)}${w.city?', ':''}${E(w.country)}</div><p>${(w.skills||'').split(',').filter(x=>x.trim()).map(x=>`<span class=tag>${E(x.trim())}</span>`).join(' ')}</p><p class=m>${E(w.bio).slice(0,140)}</p><button onclick="chat('${w.id}')">Message</button></div>`).join('')||'<div class=c>No workers match. Try fewer filters.</div>'}
+ $('wres').innerHTML=(data||[]).map(w=>`<div class=c><b>${E(w.full_name)}</b> <span class=tag>${E(w.availability)}</span><div class=m>${E(w.headline)} · ${E(w.city)}${w.city?', ':''}${E(w.country)}</div><p>${(w.skills||'').split(',').filter(x=>x.trim()).map(x=>`<span class=tag>${E(x.trim())}</span>`).join(' ')}</p><p class=m>${E(w.bio).slice(0,140)}</p><button onclick="invite('${w.id}')">⚡ Invite to apply</button><button class=g onclick="chat('${w.id}')">Message</button></div>`).join('')||'<div class=c>No workers match. Try fewer filters.</div>'}
+const CONTACT='';const LAST='24 October 2026';
+const LG={
+terms:['Terms of Service',`<p class=m>Last updated ${LAST}. WorkLink is an early test version.</p>
+<h3>1. What WorkLink is</h3><p>WorkLink is an online marketplace where workers and employers can find and contact each other. WorkLink is not an employer, recruiter or staffing agency, and is not a party to any agreement between users. We do not guarantee any job, worker, hire or income.</p>
+<h3>2. Who can use it</h3><p>You must be 18 or older and able to make legally binding agreements. Give accurate information and keep only one account.</p>
+<h3>3. Your account</h3><p>Keep your password private. You are responsible for activity on your account. Tell us at once if you think someone else has access.</p>
+<h3>4. What is not allowed</h3><ul><li>Fake, misleading or scam job posts or profiles</li><li>Asking anyone to pay a fee, deposit or purchase to apply for or get a job</li><li>Unlawful discrimination, harassment, threats or hate</li><li>Illegal work, human trafficking, or exploitation of any person</li><li>Impersonation, phishing, malware or collecting other users' data</li><li>Trying to break, overload or bypass the service</li></ul>
+<h3>5. Jobs and hiring</h3><p>Employers are responsible for the accuracy of their listings, for fair pay, and for following the employment, tax, safety and work-permit laws that apply. Workers are responsible for their qualifications and their legal right to do the work. Any work agreement is only between the employer and the worker.</p><p>A verified badge means the account's email address was confirmed. It is not a check of identity or business, and it is not a guarantee that a job or person is safe or reliable.</p>
+<h3>6. Your content</h3><p>You own what you post. You give WorkLink permission to store and show it so the service can run. We may remove content or suspend accounts that break these terms or put others at risk.</p>
+<h3>7. Payments</h3><p>WorkLink does not process payments. Workers and employers arrange pay between themselves. If paid features are added later, they will come with their own terms.</p>
+<h3>8. Service availability</h3><p>The service is provided as is and as available. It may change, pause or lose data, and we give no warranty that it will be error-free or always online.</p>
+<h3>9. Limit of liability</h3><p>As far as the law allows, WorkLink is not liable for the conduct of users, for lost income or opportunities, or for indirect losses. Nothing here limits any right or liability that cannot be limited by law.</p>
+<h3>10. Ending your use</h3><p>You can stop using WorkLink at any time and ask us to delete your account. We may suspend or remove accounts that break these terms.</p>
+<h3>11. Changes</h3><p>We may update these terms. If you keep using WorkLink after a change, you accept the new terms. We will tell users about major changes in the app.</p>
+<h3>12. Governing law</h3><p>These terms are governed by the laws of Kenya, without removing any mandatory consumer rights you have where you live.</p>`],
+privacy:['Privacy Policy',`<p class=m>Last updated ${LAST}.</p>
+<h3>What we collect</h3><p>Your email and password (the password is stored securely, not readable by us), name, country, city, language and time zone. If you add them: headline, bio, skills and availability. Also the jobs you post, applications you send, messages, and notifications.</p>
+<h3>How we use it</h3><p>To create your account, show jobs and profiles, connect workers with employers, send verification and reset emails, and keep the service safe. We do not sell your data and we do not show ads.</p>
+<h3>Who can see what</h3><ul><li>Worker profile details (name, headline, bio, skills, city, country, availability) can be seen by logged-in users.</li><li>Job listings can be seen by logged-in users.</li><li>Messages can be seen by the two people in the chat. They are not end-to-end encrypted, so people who run the service and its database could technically access them.</li><li>Your email address is not shown to other users.</li><li>Documents you upload (CV, certificates) are private. Employers can open them only if you apply to their job. Do not upload ID numbers or bank details.</li></ul>
+<h3>Services we rely on</h3><p>Supabase stores accounts and data and sends emails. GitHub Pages hosts the website and may log visitor technical data such as IP addresses. Your data may be processed in countries other than yours.</p>
+<h3>Your device</h3><p>Your login session is stored in your browser so you stay signed in. We do not use advertising trackers.</p>
+<h3>How long we keep it</h3><p>Until you ask us to delete your account, or the account is removed for breaking the rules.</p>
+<h3>Your choices</h3><p>You can edit your profile in the app. You can ask to see, correct or delete your data by contacting us. Depending on where you live (for example under the Kenya Data Protection Act or the EU GDPR) you may have more rights, which we will respect.</p>
+<h3>Security</h3><p>Data travels over HTTPS and access rules limit what each user can read. No online service is completely secure.</p>
+<h3>Age</h3><p>WorkLink is for people 18 and older. Contact us if you believe a child has registered.</p>
+<h3>Changes</h3><p>We may update this policy and will tell users about major changes.</p>`],
+rules:['Community Rules',`<h3>Be honest</h3><p>Post only real jobs and real information about yourself. Show the true pay and conditions.</p>
+<h3>Never charge to hire</h3><p>No fees, deposits or paid kits to apply for a job or get hired. Reporting this is always welcome.</p>
+<h3>Treat people with respect</h3><p>No harassment, threats, hate or unfair treatment because of who someone is.</p>
+<h3>Keep it legal and safe</h3><p>No illegal work, no exploitation, and no work that puts people in unsafe conditions without proper protection.</p>
+<h3>Protect privacy</h3><p>Do not share other people's personal information without permission.</p>
+<h3>What happens if you break the rules</h3><p>We may remove content, suspend accounts, or block repeat offenders.</p>`],
+safety:['Job Safety Tips',`<h3>If you are looking for work</h3><ul><li>Never pay money to get a job, interview or training.</li><li>Be careful with pay that sounds too good to be true.</li><li>Never share passwords, one-time codes, bank logins or ID photos with someone you have not verified.</li><li>Meet new employers in a public place first and tell someone you trust where you are going.</li><li>Agree pay, hours and tasks in writing before you start.</li></ul>
+<h3>If you are hiring</h3><ul><li>Check identity and the right to work before you hire.</li><li>Agree the work and pay in writing and pay on time.</li><li>Keep workers' personal information private.</li></ul>
+<h3>If something feels wrong</h3><p>Stop talking to the person, keep screenshots, and contact us. A report button inside the app is planned.</p>`]};
+function back(){me?go('me'):authView('login')}
+function legal(k){
+ if(!k||!LG[k])return app.innerHTML=`<a onclick="back()">← Back</a><h2>Terms, privacy &amp; safety</h2>${Object.keys(LG).map(x=>`<div class=c onclick="legal('${x}')"><b>${LG[x][0]}</b></div>`).join('')}<p class=m>Last updated ${LAST}</p>`;
+ app.innerHTML=`<a onclick="legal()">← All documents</a><h2>${LG[k][0]}</h2><div class=legal>${LG[k][1]}</div><p class=m>Contact: ${E(CONTACT)||'support contact coming soon'}</p>`}
+async function adminUser(id,k,v){const{error}=await sb.from('profiles').update({[k]:v}).eq('id',id);error?toast(error.message):(toast('Done'),V.admin())}
+async function adminJob(id){if(!confirm('Remove this job?'))return;await sb.from('jobs').delete().eq('id',id);V.admin()}
+async function closeReport(id){await sb.from('reports').update({status:'dismissed'}).eq('id',id);V.admin()}
+async function report(id){const r=prompt('Why are you reporting this job? (fake, asks for money, offensive...)');if(!r)return;const{error}=await sb.from('reports').insert({reporter_id:me.id,job_id:id,reason:r});toast(error?error.message:'Report sent. Thank you.')}
+async function invite(wid){const{data}=await sb.from('jobs').select('id,title').eq('employer_id',me.id).eq('status','open').order('created_at',{ascending:false}).limit(1);
+ if(!data||!data.length)return toast('Post a job first, then invite workers');const j=data[0];
+ await sb.from('messages').insert({sender_id:me.id,receiver_id:wid,body:`Hi! I would like to invite you to apply for ${j.title}. Please open Jobs and apply when you are ready.`});
+ notify(wid,`${me.full_name} invited you to apply for ${j.title}`);toast('Invitation sent for '+j.title)}
+async function loadDocs(){const{data}=await sb.from('documents').select('*').eq('user_id',me.id).order('created_at',{ascending:false});
+ $('docs').innerHTML=`<h3>My documents</h3><p class=m>Upload your CV, certificates and other application papers (PDF, Word or photo, max 5 MB). Employers see them only when you apply to their job. Do not upload ID numbers or bank details.</p>${(data||[]).map(d=>`<div class=c><b>${E(d.doc_type)}</b> · ${E(d.name)}<br><button class=g onclick="openDoc('${d.path}')">View</button><button class=r onclick="delDoc('${d.id}','${d.path}')">Delete</button></div>`).join('')}<select id=dtp>${opt(['CV / Resume','Certificate','Cover letter','Reference letter','Other'])}</select><input id=dfl type=file accept=".pdf,.doc,.docx,image/*"><button onclick="upDoc()">Upload</button>`}
+async function upDoc(){const x=$('dfl').files[0];if(!x)return toast('Choose a file first');if(x.size>5242880)return toast('File is over 5 MB');
+ const p=`${me.id}/${Date.now()}-${x.name.toLowerCase().replace(/[^a-z0-9.]+/g,'-')}`;
+ const{error}=await sb.storage.from('docs').upload(p,x);if(error)return toast(error.message);
+ const{error:e2}=await sb.from('documents').insert({user_id:me.id,name:x.name,doc_type:f('dtp'),path:p});if(e2)return toast(e2.message);toast('Uploaded ✓');loadDocs()}
+async function delDoc(id,p){if(!confirm('Delete this document?'))return;await sb.storage.from('docs').remove([p]);await sb.from('documents').delete().eq('id',id);loadDocs()}
+async function openDoc(p){const{data,error}=await sb.storage.from('docs').createSignedUrl(p,300);if(error)return toast(error.message);window.open(data.signedUrl,'_blank')||(location.href=data.signedUrl)}
 boot();
 </script></body></html>
