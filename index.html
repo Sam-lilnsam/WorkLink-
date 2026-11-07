@@ -75,6 +75,7 @@ const TZ=Intl.DateTimeFormat().resolvedOptions().timeZone;
 let sb,me,tab,poll,rec=false,J={},curTitle='';
 async function boot(){try{const eh=new URLSearchParams(location.hash.slice(1));if(eh.get('error_description')){toast(eh.get('error_description').replace(/\+/g,' '));history.replaceState(null,'',location.pathname)}}catch(e){}
  sb=supabase.createClient(CFG.u,CFG.k);
+ const hh=location.hash.slice(1);if(['terms','privacy','rules','safety'].includes(hh)){document.body.classList.remove('hasnav');$('nav').style.display='none';legal(hh);return}
  sb.auth.onAuthStateChange(e=>{if(e=='PASSWORD_RECOVERY'){rec=true;newPw()}});
  const{data:{session}}=await sb.auth.getSession();
  if(!rec)session?load(session.user):(tourSeen()?authView('login'):tour());
